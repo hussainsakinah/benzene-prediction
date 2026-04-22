@@ -1,4 +1,4 @@
-# 🌫️ Benzene Content Prediction — Air Quality UCI Dataset
+# Benzene Content Prediction — Air Quality UCI Dataset
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/hussainsakinah/benzene-prediction/main?filepath=notebooks/benzene_prediction.ipynb)
 [![nbviewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/hussainsakinah/benzene-prediction/blob/main/notebooks/benzene_prediction.ipynb)
@@ -7,7 +7,7 @@ Predict the concentration of **benzene (C6H6)** in urban air using machine learn
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 benzene-prediction/
@@ -21,7 +21,7 @@ benzene-prediction/
 
 ---
 
-## 📊 Dataset
+## Dataset
 
 - **Source:** [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/machine-learning-databases/00360/AirQualityUCI.zip)
 - **Records:** ~9,300 hourly readings (after cleaning)
@@ -44,7 +44,7 @@ The dataset is downloaded automatically at runtime — no manual download needed
 
 ---
 
-## 🤖 Models
+## Models
 
 | Model | Tuning Method |
 |-------|--------------|
@@ -60,7 +60,7 @@ All GridSearch models use a `Pipeline` of `PolynomialFeatures → StandardScaler
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Clone the repo
 
@@ -91,7 +91,7 @@ jupyter notebook notebooks/benzene_prediction.ipynb
 
 ---
 
-## 📈 Evaluation Metrics
+## Evaluation Metrics
 
 Each model is evaluated on the held-out test set using:
 - **MSE** — Mean Squared Error
@@ -99,7 +99,7 @@ Each model is evaluated on the held-out test set using:
 
 ---
 
-## 🐛 Bug Fixes (vs. original submission)
+## Bug Fixes (vs. original submission)
 
 Three copy-paste bugs were corrected in the evaluation cells:
 
@@ -111,7 +111,7 @@ Three copy-paste bugs were corrected in the evaluation cells:
 
 ---
 
-## 👤 Author
+## Author
 
 **Sakinah Hussain** — Assignment 2
 🔗 [github.com/hussainsakinah](https://github.com/hussainsakinah)
