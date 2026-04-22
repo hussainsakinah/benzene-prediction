@@ -32,7 +32,7 @@ The dataset is downloaded automatically at runtime — no manual download needed
 
 ---
 
-## ⚙️ Preprocessing
+## Preprocessing
 
 | Step | Detail |
 |------|--------|
