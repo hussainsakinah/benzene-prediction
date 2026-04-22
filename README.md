@@ -99,18 +99,6 @@ Each model is evaluated on the held-out test set using:
 
 ---
 
-## Bug Fixes (vs. original submission)
-
-Three copy-paste bugs were corrected in the evaluation cells:
-
-| Location | Bug | Fix |
-|----------|-----|-----|
-| RidgeCV metrics | Used `y_pr_bc_lcv` (LassoCV predictions) | Changed to `y_pr_bc_rcv` |
-| ElasticNet R² | Used `y_pr_bc` (Linear Regression predictions) | Changed to `y_pr_bc_en` |
-| ElasticNetCV MSE | Used `y_pr_bc_lcv` (LassoCV predictions) | Changed to `y_pr_bc_ecv` |
-
----
-
 ## Author
 
 **Sakinah Hussain** — Assignment 2
