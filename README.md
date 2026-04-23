@@ -10,10 +10,7 @@ Predict the concentration of **benzene (C6H6)** in urban air using machine learn
 
 ```
 benzene-prediction/
-├── notebooks/
-│   └── benzene_prediction.ipynb   # Full exploratory notebook
-├── src/
-│   └── benzene_prediction.py      # Clean, runnable Python script
+├── app.py
 ├── requirements.txt
 └── README.md
 ```
@@ -76,17 +73,6 @@ pip install -r requirements.txt
 
 > **Note:** `numpy<2` is pinned because some Anaconda builds of pandas are compiled against NumPy 1.x.
 
-### 3a. Run the Python script
-
-```bash
-python src/benzene_prediction.py
-```
-
-### 3b. Open the notebook
-
-```bash
-jupyter notebook notebooks/benzene_prediction.ipynb
-```
 
 ---
 
@@ -100,6 +86,6 @@ Each model is evaluated on the held-out test set using:
 
 ## Author
 
-**Sakinah Hussain** — Assignment 2
-🔗 [github.com/hussainsakinah](https://github.com/hussainsakinah)
+**Sakinah Hussain**
+[github.com/hussainsakinah](https://github.com/hussainsakinah)
 #
