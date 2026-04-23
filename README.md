@@ -1,7 +1,6 @@
 # Benzene Content Prediction — Air Quality UCI Dataset
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/hussainsakinah/benzene-prediction/main?filepath=notebooks/benzene_prediction.ipynb)
-[![nbviewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/hussainsakinah/benzene-prediction/blob/main/notebooks/benzene_prediction.ipynb)
+https://benzene-prediction-fwipa42bjmyyktgdbksvhm.streamlit.app/
 
 Predict the concentration of **benzene (C6H6)** in urban air using machine learning regression models trained on the [UCI Air Quality Dataset](https://archive.ics.uci.edu/ml/datasets/Air+Quality).
 
