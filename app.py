@@ -71,12 +71,19 @@ def load_raw():
     with zip_file.open('AirQualityUCI.csv') as file:
         data = pd.read_csv(
             file, sep=';', decimal=',',
-            parse_dates={'Datetime': ['Date', 'Time']},
             na_values=-200
         )
 
+    # Combine Date + Time into Datetime manually
+    # (parse_dates dict syntax was removed in newer pandas versions)
+    if 'Date' in data.columns and 'Time' in data.columns:
+        data['Datetime'] = pd.to_datetime(
+            data['Date'].astype(str) + ' ' + data['Time'].astype(str),
+            dayfirst=True, errors='coerce'
+        )
+
     # Drop metadata and unnamed columns
-    data_pd = data.drop(columns=['Datetime', 'Unnamed: 15', 'Unnamed: 16'], errors='ignore')
+    data_pd = data.drop(columns=['Date', 'Time', 'Datetime', 'Unnamed: 15', 'Unnamed: 16'], errors='ignore')
 
     # ── BUG FIX: Remove direct benzene proxies that cause R² ≈ 1.0 ──────────
     # PT08.S2(NMHC) is a metal-oxide sensor tuned specifically to detect
@@ -299,12 +306,11 @@ def train_all_models(_X_train, _X_test, _y_train, _y_test):
 # ─────────────────────────────────────────────
 # SIDEBAR
 # ─────────────────────────────────────────────
-st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Benzene.svg/200px-Benzene.svg.png", width=100)
-st.sidebar.markdown("## 🌫️ Benzene Predictor")
+st.sidebar.markdown("## Benzene Predictor")
 st.sidebar.markdown("**Dataset:** UCI Air Quality")
 st.sidebar.markdown("**Target:** C6H6 (Benzene) µg/m³")
 st.sidebar.markdown("---")
-page = st.sidebar.radio("Navigate", ["📊 Overview", "🤖 Model Results", "🔮 Predict Benzene"])
+page = st.sidebar.radio("Navigate", ["Overview", "Model Results", "Predict Benzene"])
 st.sidebar.markdown("---")
 st.sidebar.markdown("**By:** Sakinah Hussain")
 st.sidebar.markdown("[GitHub Repo](https://github.com/hussainsakinah/benzene-prediction)")
@@ -312,10 +318,10 @@ st.sidebar.markdown("[GitHub Repo](https://github.com/hussainsakinah/benzene-pre
 # ─────────────────────────────────────────────
 # LOAD & PREPROCESS DATA
 # ─────────────────────────────────────────────
-with st.spinner("⏳ Loading data..."):
+with st.spinner("Loading data..."):
     data_pd_raw = load_raw()
 
-with st.spinner("⏳ Splitting and preprocessing (train-only transforms)..."):
+with st.spinner("Splitting and preprocessing (train-only transforms)..."):
     (
         X_train, X_test, y_train, y_test,
         skewness_train, lambdas, logged,
@@ -332,30 +338,30 @@ data_pd_display = pd.concat([X_train, y_train_named], axis=1)
 # ─────────────────────────────────────────────
 # PAGE 1 — OVERVIEW
 # ─────────────────────────────────────────────
-if page == "📊 Overview":
-    st.markdown('<div class="main-title">🌫️ Benzene Content Prediction</div>', unsafe_allow_html=True)
+if page == "Overview":
+    st.markdown('<div class="main-title">Benzene Content Prediction</div>', unsafe_allow_html=True)
     st.markdown('<div class="subtitle">Predicting C6H6 concentration in urban air using the UCI Air Quality Dataset</div>', unsafe_allow_html=True)
 
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("📋 Total Records", f"{len(data_pd_raw):,}")
-    col2.metric("📐 Features", len(data_pd_raw.columns) - 1)
-    col3.metric("🎯 Target", "C6H6(GT)")
-    col4.metric("📦 Models Trained", "7")
+    col1.metric("Total Records", f"{len(data_pd_raw):,}")
+    col2.metric("Features", len(data_pd_raw.columns) - 1)
+    col3.metric("Target", "C6H6(GT)")
+    col4.metric("Models Trained", "7")
 
-    st.markdown('<div class="section-header">📄 Dataset Preview (Training Set, Post-Transform)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header">Dataset Preview (Training Set, Post-Transform)</div>', unsafe_allow_html=True)
     st.dataframe(data_pd_display.head(10), width='stretch')
 
     col_a, col_b = st.columns(2)
 
     with col_a:
-        st.markdown('<div class="section-header">📈 Benzene Distribution (Train)</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header">Benzene Distribution (Train)</div>', unsafe_allow_html=True)
         fig = px.histogram(data_pd_display, x='C6H6(GT)', nbins=60, color_discrete_sequence=['#1f77b4'],
                            labels={'C6H6(GT)': 'Benzene (transformed)'})
         fig.update_layout(showlegend=False, margin=dict(t=20))
         st.plotly_chart(fig, width='stretch')
 
     with col_b:
-        st.markdown('<div class="section-header">📊 Feature Skewness (Train Only)</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header">Feature Skewness (Train Only)</div>', unsafe_allow_html=True)
         skew_df = skewness_train.reset_index()
         skew_df.columns = ['Feature', 'Skewness']
         fig2 = px.bar(skew_df, x='Feature', y='Skewness', color='Skewness',
@@ -365,7 +371,7 @@ if page == "📊 Overview":
         fig2.update_layout(margin=dict(t=20))
         st.plotly_chart(fig2, width='stretch')
 
-    st.markdown('<div class="section-header">🔥 Correlation Heatmap (Train)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header">Correlation Heatmap (Train)</div>', unsafe_allow_html=True)
     corr = data_pd_display.corr()
     fig3 = px.imshow(corr, text_auto='.2f', color_continuous_scale='RdBu_r', aspect='auto')
     fig3.update_layout(margin=dict(t=20))
@@ -374,11 +380,11 @@ if page == "📊 Overview":
 # ─────────────────────────────────────────────
 # PAGE 2 — MODEL RESULTS
 # ─────────────────────────────────────────────
-elif page == "🤖 Model Results":
-    st.markdown('<div class="main-title">🤖 Model Comparison</div>', unsafe_allow_html=True)
+elif page == "Model Results":
+    st.markdown('<div class="main-title">Model Comparison</div>', unsafe_allow_html=True)
     st.markdown('<div class="subtitle">All 7 regression models trained and evaluated on the Air Quality dataset</div>', unsafe_allow_html=True)
 
-    with st.spinner("⏳ Training all models — this takes ~1-2 minutes..."):
+    with st.spinner("Training all models — this takes ~1-2 minutes..."):
         results, predictions, ytest, scaler, feature_cols, xtrain, ytrain, lr_pred = train_all_models(
             X_train, X_test, y_train, y_test
         )
@@ -390,9 +396,9 @@ elif page == "🤖 Model Results":
     df_summary = pd.DataFrame(summary).sort_values('R²', ascending=False).reset_index(drop=True)
 
     best_model = df_summary.iloc[0]['Model']
-    st.success(f"🏆 Best Model: **{best_model}** — R² = {df_summary.iloc[0]['R²']}")
+    st.success(f"Best Model: **{best_model}** — R² = {df_summary.iloc[0]['R²']}")
 
-    st.markdown('<div class="section-header">📋 Results Table</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header">Results Table</div>', unsafe_allow_html=True)
     st.dataframe(df_summary.style.highlight_max(subset=['R²'], color='#d4edda')
                                   .highlight_min(subset=['MSE'], color='#d4edda'),
                  width='stretch')
@@ -400,7 +406,7 @@ elif page == "🤖 Model Results":
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown('<div class="section-header">📊 R² Score by Model</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header">R² Score by Model</div>', unsafe_allow_html=True)
         fig = px.bar(df_summary, x='Model', y='R²', color='R²',
                      color_continuous_scale='Blues', text='R²')
         fig.update_traces(texttemplate='%{text:.3f}', textposition='outside')
@@ -408,7 +414,7 @@ elif page == "🤖 Model Results":
         st.plotly_chart(fig, width='stretch')
 
     with col2:
-        st.markdown('<div class="section-header">📊 MSE by Model</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header">MSE by Model</div>', unsafe_allow_html=True)
         fig2 = px.bar(df_summary.sort_values('MSE'), x='Model', y='MSE', color='MSE',
                       color_continuous_scale='Reds_r', text='MSE')
         fig2.update_traces(texttemplate='%{text:.3f}', textposition='outside')
@@ -416,7 +422,7 @@ elif page == "🤖 Model Results":
         st.plotly_chart(fig2, width='stretch')
 
     # Actual vs Predicted
-    st.markdown('<div class="section-header">🔍 Actual vs Predicted — Select Model</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header">Actual vs Predicted — Select Model</div>', unsafe_allow_html=True)
     chosen = st.selectbox("Choose a model to inspect:", list(predictions.keys()))
     y_pred_chosen = predictions[chosen]
 
@@ -442,17 +448,17 @@ elif page == "🤖 Model Results":
 # FIX 3: lr_pred is now returned from train_all_models
 #         (fitted on train set only, not full data)
 # ─────────────────────────────────────────────
-elif page == "🔮 Predict Benzene":
-    st.markdown('<div class="main-title">🔮 Predict Benzene Level</div>', unsafe_allow_html=True)
+elif page == "Predict Benzene":
+    st.markdown('<div class="main-title">Predict Benzene Level</div>', unsafe_allow_html=True)
     st.markdown('<div class="subtitle">Enter sensor readings to get a real-time benzene concentration prediction</div>', unsafe_allow_html=True)
 
-    with st.spinner("⏳ Training models..."):
+    with st.spinner("Training models..."):
         results, predictions, ytest, scaler, feature_cols, xtrain, ytrain, lr_pred = train_all_models(
             X_train, X_test, y_train, y_test
         )
 
-    st.markdown('<div class="section-header">🎛️ Input Sensor Values</div>', unsafe_allow_html=True)
-    st.info("💡 Adjust sliders to match real sensor readings. Default values are training-set averages.")
+    st.markdown('<div class="section-header">Input Sensor Values</div>', unsafe_allow_html=True)
+    st.info("Adjust sliders to match real sensor readings. Default values are training-set averages.")
 
     # Use TRAIN set stats for slider defaults/bounds (not full dataset)
     defaults = X_train.mean()
@@ -469,7 +475,7 @@ elif page == "🔮 Predict Benzene":
             inputs[feat] = st.slider(feat, min_value=mn, max_value=mx, value=default, key=feat)
 
     st.markdown("---")
-    if st.button("🔮 Predict Benzene Concentration", type="primary", width='stretch'):
+    if st.button("Predict Benzene Concentration", type="primary", width='stretch'):
         input_df    = pd.DataFrame([inputs])
         scaled_input = scaler.transform(input_df)     # scaler fitted on train only
 
@@ -477,11 +483,11 @@ elif page == "🔮 Predict Benzene":
 
         st.markdown("---")
         col_r1, col_r2, col_r3 = st.columns(3)
-        col_r1.metric("🌫️ Predicted Benzene", f"{pred:.4f} (transformed)")
-        col_r2.metric("📊 Train-set Mean", f"{y_train.mean():.4f}")
+        col_r1.metric("Predicted Benzene", f"{pred:.4f} (transformed)")
+        col_r2.metric("Train-set Mean", f"{y_train.mean():.4f}")
 
-        level = "🟢 Low" if pred < 5 else ("🟡 Moderate" if pred < 15 else "🔴 High")
-        col_r3.metric("⚠️ Risk Level", level)
+        level = "Low" if pred < 5 else ("Moderate" if pred < 15 else "High")
+        col_r3.metric("Risk Level", level)
 
         # Gauge chart
         fig = go.Figure(go.Indicator(
